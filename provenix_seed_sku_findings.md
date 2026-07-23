@@ -306,3 +306,52 @@ here.
 
 5 of 12 fully unresolved, 3 high-confidence single-facility, 4 moderate with multiple linked
 candidates. A realistic spread, not cherry-picked toward either extreme.
+
+---
+
+## Recalls and adverse events for the 8 batch-2 brands (retrieved 2026-07-23)
+
+Same openFDA pipeline as the original 4 brands (`recalling_firm` for recalls, SUSPECT-role
+`products.name_brand` match for adverse events).
+
+**Important exclusion, same reasoning as the brand/facility split:** several corporate-parent-name
+searches returned real recalls that belong to a *different sister brand* under the same
+manufacturer, not the brand actually seeded. Linking these would misattribute one brand's problem
+to another:
+- Searching "Glanbia" returns 1 recall — for **"think!"** protein bars, a different Glanbia-owned
+  brand, not Optimum Nutrition. Excluded.
+- Searching "NBTY" returns 6 recalls — all for **Solgar, MET-Rx, and Pure Protein** products,
+  other NBTY-owned brands, not Nature's Bounty itself. Excluded.
+- Searching "Costco"/"Wal-Mart" for Kirkland Signature/Spring Valley returns recalls, but they're
+  all **unrelated food-category items** (a chicken sandwich, salmon, bakery goods) under the same
+  umbrella private-label name — completely different product category from the supplement SKUs
+  seeded. Excluded.
+
+**Recalls actually attributable to the seeded brand:**
+- **NOW Foods: 14 recalls**, mostly Class II/III, all Terminated/Completed. Reasons span
+  undeclared allergens (soy lecithin x4, gluten, pine nut, licorice/glycyrrhizin), mislabeling
+  (Molybdenum mg/mcg error, B-50 label error, yeast mix-up), a contamination case (chloramphenicol
+  antibiotic in digestive enzyme capsules, 2013), and one high mold/yeast/viable-count finding
+  (2024).
+- **Nordic Naturals: 2 recalls** — elevated Vitamin D3 levels in a baby liquid D3 product
+  (2024-02-07, Class II) and a mislabeling issue in a kids' gummy multivitamin (2025-05-02, Class
+  III).
+- **Optimum Nutrition, Ritual, Nature's Bounty, Kirkland Signature, Spring Valley, Cellucor: 0**
+  recalls attributable to the actual brand (after excluding the sister-brand/unrelated-category
+  results above).
+
+**Adverse events (SUSPECT-role reports, `products.name_brand` match):**
+
+| Brand | SUSPECT-role reports |
+|---|---|
+| NOW Foods | 47 |
+| Optimum Nutrition | 26 |
+| Nordic Naturals | 31 |
+| Ritual | 134 |
+| Nature's Bounty | 548 |
+| Kirkland Signature | 390 |
+| Spring Valley | 322 |
+| Cellucor | 69 |
+
+Same CAERS caveat applies: no causal relationship can be drawn, and these counts must always
+render with that disclaimer context, never as a raw number.
