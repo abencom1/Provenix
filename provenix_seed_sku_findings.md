@@ -355,3 +355,54 @@ to another:
 
 Same CAERS caveat applies: no causal relationship can be drawn, and these counts must always
 render with that disclaimer context, never as a raw number.
+
+---
+
+## Lab testing tiers and certifications (retrieved 2026-07-24)
+
+**Certifications: DSLD label claims only, NOT verified against the certifier's own site.** Per
+the worksheet's own rule (NSF's ToS forbids scraping; verify at the certifier's site, never trust
+a marketing badge), I pulled these from DSLD's structured "Seals/Symbols"/formulation statements
+— a legitimate public NIH source, not NSF's gatekept database — but have not clicked through
+USP's/NSF's/Informed-Choice's own verification tools. Logged with `status = 'claimed_unverified'`,
+`source = 'dsld_label_claim'`. **Manual verification still needed** before treating any of these
+as confirmed:
+
+| Product | Claimed cert | `certification_type` |
+|---|---|---|
+| Nature Made D3 | USP Verified | `usp_verified` |
+| Optimum Nutrition Whey | Informed-Choice "Trusted by Sport" + banned-substance tested | `informed_choice` |
+| Ritual Essential for Women | "USP verified" (in formulation text) | `usp_verified` |
+| Garden of Life Vitamin Code | NSF Certified **Gluten-Free** (a specific NSF program, doesn't map cleanly to `nsf_ansi_173`/`nsf_certified_for_sport`) | `other` |
+| Kirkland Signature D3 | "Dietary Supplement USP verified" | `usp_verified` |
+
+Optimum Nutrition's claim is corroborated further by their own official support pages, which name
+"Gold Standard 100% Whey" specifically as Informed-Choice certified — stronger than a label claim
+alone, but still not the certifier's own database directly (that page, choice.wetestyoutrust.com,
+blocked automated fetches).
+
+**Important exclusion:** Cellucor's NSF Certified for Sport applies to **"C4 Sport"/"C4 Performance
+Energy"** — a different product line from our seeded **"C4 Original."** Not applying that
+certification to the seeded SKU. No certification found for: NOW Foods, Thorne (either product),
+Nordic Naturals, Nature's Bounty, FGO, Spring Valley, Cellucor C4 Original.
+
+**Lab testing tiers** — checked each brand's own site/press coverage for a public per-lot CoA
+lookup (no ToS restriction on this, unlike certifications):
+
+| Product | Tier | Why |
+|---|---|---|
+| Nature Made D3 | `claimed_no_public_coa` | Extensive internal testing (HPLC, IR, mass spec) and supplier CoA requirements, but no public per-lot lookup found |
+| NOW Foods Magnesium Citrate | `claimed_no_public_coa` | Has a CoA portal (cofa.nowfoods.com) but it's scoped to essential oils only, not this product |
+| Thorne Vitamin D / Ashwagandha | `claimed_no_public_coa` | Confirmed directly via thorne.com/quality: "4 rounds of testing," in-house labs, but no consumer lot-lookup tool |
+| Optimum Nutrition Whey | `claimed_no_public_coa` | Facility-level NSF/Informed-Choice/BRCGS certs exist, no public per-lot CoA search found |
+| **Nordic Naturals Ultimate Omega** | **`public_per_lot_lookup`** | Confirmed real tool at nordic.com/nordic-promise — enter lot number or scan bottle QR code |
+| Ritual Essential for Women | `coa_not_per_lot` | Real "Certificate of Traceability" with per-lot heavy-metal/microbe testing claims, but unclear if searchable by an individual bottle's lot number — not claiming Tier 4 without that confirmation |
+| Garden of Life Vitamin Code | `claimed_no_public_coa` | CoAs are public for their CBD product line specifically; "results for other products are not typically displayed publicly" |
+| Nature's Bounty Fish Oil | `claimed_no_public_coa` | Explicitly confirmed: "no broad public U.S. batch-level COA portal," shoppers cannot verify lots numerically |
+| Kirkland Signature D3 | `claimed_no_public_coa` | USP claim well-supported brand-wide; no public per-lot tool found |
+| FGO Ashwagandha | `no_testing_claimed` | No testing claim found at all — only organic/Non-GMO certifications, consistent with this brand's overall opacity |
+| Spring Valley Turmeric | `claimed_no_public_coa` | Supplier CoAs + finished-product third-party testing claimed, no public lookup tool found |
+| Cellucor C4 Original | `claimed_no_public_coa` | General Nutrabolt testing claims exist but the clearest citation ties to a new India manufacturing announcement, not clearly this exact product |
+
+Only Nordic Naturals qualifies for Tier 4 — a real, meaningful result, not an assumption that "big
+brand = best tier."
