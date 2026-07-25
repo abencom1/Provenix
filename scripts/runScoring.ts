@@ -42,19 +42,37 @@ async function buildScoringInput(product: SeedProduct): Promise<ProductScoringIn
     .eq("is_current", true)
     .maybeSingle();
 
-  let facilityCount = 0;
+  let facilityIds: string[] = [];
   if (attribution) {
-    const { count } = await supabase
+    const { data: facilityLinks } = await supabase
       .from("manufacturer_attribution_facilities")
-      .select("facility_id", { count: "exact", head: true })
+      .select("facility_id")
       .eq("attribution_id", attribution.id);
-    facilityCount = count ?? 0;
+    facilityIds = (facilityLinks ?? []).map((f) => f.facility_id);
   }
+  const facilityCount = facilityIds.length;
 
   const { data: recalls } = await supabase
     .from("recalls")
     .select("classification, status")
     .or(`product_id.eq.${product.id},brand_id.eq.${product.brand_id}`);
+
+  const { data: inspections } =
+    facilityIds.length > 0
+      ? await supabase
+          .from("inspection_classifications")
+          .select("classification")
+          .in("facility_id", facilityIds)
+      : { data: [] as { classification: string }[] };
+
+  const regulatoryActionsOr =
+    facilityIds.length > 0
+      ? `brand_id.eq.${product.brand_id},facility_id.in.(${facilityIds.join(",")})`
+      : `brand_id.eq.${product.brand_id}`;
+  const { data: regulatoryActions } = await supabase
+    .from("regulatory_actions")
+    .select("status")
+    .or(regulatoryActionsOr);
 
   const { data: adverseEvents } = await supabase
     .from("adverse_event_counts")
@@ -87,6 +105,12 @@ async function buildScoringInput(product: SeedProduct): Promise<ProductScoringIn
       recalls: (recalls ?? []).map((r) => ({
         classification: r.classification,
         status: r.status as "active" | "closed",
+      })),
+      inspectionClassifications: (inspections ?? []).map((i) => ({
+        classification: i.classification as "NAI" | "VAI" | "OAI",
+      })),
+      regulatoryActions: (regulatoryActions ?? []).map((a) => ({
+        status: a.status as "active" | "closed",
       })),
     },
     adverseEvents: { reportCount: adverseEvents?.report_count ?? null },

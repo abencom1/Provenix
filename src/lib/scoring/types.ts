@@ -10,8 +10,18 @@ export type RecallRecord = {
   status: "active" | "closed";
 };
 
+export type InspectionClassificationRecord = {
+  classification: "NAI" | "VAI" | "OAI";
+};
+
+export type RegulatoryActionRecord = {
+  status: "active" | "closed";
+};
+
 export type RegulatoryComplianceInput = {
   recalls: RecallRecord[];
+  inspectionClassifications: InspectionClassificationRecord[];
+  regulatoryActions: RegulatoryActionRecord[];
 };
 
 export type AdverseEventsInput = {

@@ -38,12 +38,32 @@ const RECALL_PENALTY_CAP: Record<string, number> = {
   "Class III": 12,
 };
 
+// FDA's own per-inspection classification (see migration 005). Same
+// capped-per-class pattern as recalls, for the same reason: a facility with
+// a long inspection history shouldn't be driven straight to 0 just because
+// it's been inspected many times.
+const INSPECTION_PENALTY: Record<string, number> = {
+  OAI: 12,
+  VAI: 5,
+  NAI: 0,
+};
+const INSPECTION_PENALTY_CAP: Record<string, number> = {
+  OAI: 40,
+  VAI: 15,
+  NAI: 0,
+};
+
+// regulatory_actions (migration 004) is agency-agnostic by design — the one
+// example so far is Herbalife's FTC consent order. Flat per-action penalty,
+// not doubled for active status like recalls: an "active" consent order
+// often just means an ongoing compliance framework is still in effect, not
+// necessarily a live escalating risk the way an unresolved recall is.
+// Revisit this once there's a wider range of agencies/action types to judge
+// severity by.
+const REGULATORY_ACTION_PENALTY = 15;
+const REGULATORY_ACTION_PENALTY_CAP = 40;
+
 export function scoreRegulatoryCompliance(input: RegulatoryComplianceInput): number {
-  // v1 scores recalls only. Warning letters and import alerts were checked
-  // for some brands but not consistently across all 12 seeded SKUs (see
-  // provenix_seed_sku_findings.md) — folding them in now would silently
-  // reward brands we simply haven't finished researching yet. Revisit once
-  // that coverage is consistent everywhere.
   const penaltyBySeverity: Record<string, number> = {};
   for (const recall of input.recalls) {
     const key = recall.classification ?? "unclassified";
@@ -52,12 +72,35 @@ export function scoreRegulatoryCompliance(input: RegulatoryComplianceInput): num
     penaltyBySeverity[key] = (penaltyBySeverity[key] ?? 0) + penalty;
   }
 
-  let totalPenalty = 0;
+  let recallPenalty = 0;
   for (const [key, penalty] of Object.entries(penaltyBySeverity)) {
     const cap = RECALL_PENALTY_CAP[key] ?? 20;
-    totalPenalty += Math.min(penalty, cap);
+    recallPenalty += Math.min(penalty, cap);
   }
 
+  // Rolls up across every facility linked to the current attribution,
+  // matching manufacturer_attribution_facilities' own design intent: sum
+  // company-level regulatory signal across all known candidate plants
+  // rather than requiring one pinned facility. Not recency-weighted in
+  // v1 — an old, resolved OAI counts the same as a recent one.
+  const inspectionPenaltyByClass: Record<string, number> = {};
+  for (const insp of input.inspectionClassifications) {
+    const unitPenalty = INSPECTION_PENALTY[insp.classification] ?? 0;
+    inspectionPenaltyByClass[insp.classification] =
+      (inspectionPenaltyByClass[insp.classification] ?? 0) + unitPenalty;
+  }
+  let inspectionPenalty = 0;
+  for (const [key, penalty] of Object.entries(inspectionPenaltyByClass)) {
+    const cap = INSPECTION_PENALTY_CAP[key] ?? 20;
+    inspectionPenalty += Math.min(penalty, cap);
+  }
+
+  const regulatoryActionPenalty = Math.min(
+    input.regulatoryActions.length * REGULATORY_ACTION_PENALTY,
+    REGULATORY_ACTION_PENALTY_CAP,
+  );
+
+  const totalPenalty = recallPenalty + inspectionPenalty + regulatoryActionPenalty;
   return Math.max(0, 100 - totalPenalty);
 }
 
