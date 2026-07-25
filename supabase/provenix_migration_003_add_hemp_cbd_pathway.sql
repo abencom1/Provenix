@@ -1,0 +1,25 @@
+-- ============================================================================
+-- PROVENIX — Migration 003: add 'hemp_cbd_unclassified' regulatory pathway
+--
+-- regulatory_pathway previously had three values: supplement_gmp, food_gmp,
+-- conventional_beverage — none of which fit hemp-derived CBD. FDA's own
+-- position is that CBD does not qualify as a dietary supplement under DSHEA
+-- (due to the prior Epidiolex drug approval), yet Charlotte's Web's own SEC
+-- 10-K explicitly invokes 21 CFR Part 111 (supplement cGMP) as its
+-- manufacturing framework, and its label carries a materially different
+-- disclaimer profile (21+ age restriction, THC drug-test warning) than a
+-- normal supplement. Forcing this into supplement_gmp would misrepresent a
+-- genuinely unsettled regulatory status as settled — the same "unresolved is
+-- a legitimate answer" principle already applied to facility_id/confidence
+-- being nullable extends here to the pathway itself.
+--
+-- Named 'hemp_cbd_unclassified' rather than something more specific so it
+-- can cover the category generally, not just this one brand. Existing
+-- products keep their current regulatory_pathway value; backfill only if a
+-- specific product turns out to need reclassifying.
+--
+-- Purely additive — existing rows/values are unaffected. As with migration
+-- 002, this new enum value cannot be used in the same script that adds it.
+-- ============================================================================
+
+alter type regulatory_pathway add value 'hemp_cbd_unclassified';
