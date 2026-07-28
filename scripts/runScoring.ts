@@ -74,6 +74,15 @@ async function buildScoringInput(product: SeedProduct): Promise<ProductScoringIn
     .select("status")
     .or(regulatoryActionsOr);
 
+  const warningLettersOr =
+    facilityIds.length > 0
+      ? `brand_id.eq.${product.brand_id},facility_id.in.(${facilityIds.join(",")})`
+      : `brand_id.eq.${product.brand_id}`;
+  const { data: warningLetters } = await supabase
+    .from("warning_letters")
+    .select("status")
+    .or(warningLettersOr);
+
   const { data: adverseEvents } = await supabase
     .from("adverse_event_counts")
     .select("report_count")
@@ -111,6 +120,9 @@ async function buildScoringInput(product: SeedProduct): Promise<ProductScoringIn
       })),
       regulatoryActions: (regulatoryActions ?? []).map((a) => ({
         status: a.status as "active" | "closed",
+      })),
+      warningLetters: (warningLetters ?? []).map((w) => ({
+        status: w.status as "active" | "closed",
       })),
     },
     adverseEvents: { reportCount: adverseEvents?.report_count ?? null },

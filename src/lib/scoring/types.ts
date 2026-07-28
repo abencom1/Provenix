@@ -18,10 +18,15 @@ export type RegulatoryActionRecord = {
   status: "active" | "closed";
 };
 
+export type WarningLetterRecord = {
+  status: "active" | "closed";
+};
+
 export type RegulatoryComplianceInput = {
   recalls: RecallRecord[];
   inspectionClassifications: InspectionClassificationRecord[];
   regulatoryActions: RegulatoryActionRecord[];
+  warningLetters: WarningLetterRecord[];
 };
 
 export type AdverseEventsInput = {

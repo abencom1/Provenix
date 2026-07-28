@@ -63,6 +63,15 @@ const INSPECTION_PENALTY_CAP: Record<string, number> = {
 const REGULATORY_ACTION_PENALTY = 15;
 const REGULATORY_ACTION_PENALTY_CAP = 40;
 
+// warning_letters has no severity classification (unlike recalls/inspections)
+// — every letter already represents FDA finding an explicit law violation
+// (unapproved drug / misbranded / adulterated), which is at least as severe
+// as an OAI inspection finding, so the base penalty sits above OAI's. Active
+// vs. closed doubles the penalty the same way recalls do: an unresolved
+// letter is a live, ongoing violation, not a resolved historical one.
+const WARNING_LETTER_PENALTY = 20;
+const WARNING_LETTER_PENALTY_CAP = 50;
+
 export function scoreRegulatoryCompliance(input: RegulatoryComplianceInput): number {
   const penaltyBySeverity: Record<string, number> = {};
   for (const recall of input.recalls) {
@@ -100,7 +109,15 @@ export function scoreRegulatoryCompliance(input: RegulatoryComplianceInput): num
     REGULATORY_ACTION_PENALTY_CAP,
   );
 
-  const totalPenalty = recallPenalty + inspectionPenalty + regulatoryActionPenalty;
+  const warningLetterPenaltyRaw = input.warningLetters.reduce(
+    (sum, letter) =>
+      sum + (letter.status === "active" ? WARNING_LETTER_PENALTY * 2 : WARNING_LETTER_PENALTY),
+    0,
+  );
+  const warningLetterPenalty = Math.min(warningLetterPenaltyRaw, WARNING_LETTER_PENALTY_CAP);
+
+  const totalPenalty =
+    recallPenalty + inspectionPenalty + regulatoryActionPenalty + warningLetterPenalty;
   return Math.max(0, 100 - totalPenalty);
 }
 
