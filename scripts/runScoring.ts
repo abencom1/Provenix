@@ -83,6 +83,11 @@ async function buildScoringInput(product: SeedProduct): Promise<ProductScoringIn
     .select("status")
     .or(warningLettersOr);
 
+  const { data: ndiFlags } = await supabase
+    .from("ndi_flags")
+    .select("expected_notification, notification_found")
+    .eq("product_id", product.id);
+
   const { data: adverseEvents } = await supabase
     .from("adverse_event_counts")
     .select("report_count")
@@ -123,6 +128,10 @@ async function buildScoringInput(product: SeedProduct): Promise<ProductScoringIn
       })),
       warningLetters: (warningLetters ?? []).map((w) => ({
         status: w.status as "active" | "closed",
+      })),
+      ndiFlags: (ndiFlags ?? []).map((f) => ({
+        expectedNotification: f.expected_notification,
+        notificationFound: f.notification_found,
       })),
     },
     adverseEvents: { reportCount: adverseEvents?.report_count ?? null },

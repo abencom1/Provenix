@@ -72,6 +72,18 @@ const REGULATORY_ACTION_PENALTY_CAP = 40;
 const WARNING_LETTER_PENALTY = 20;
 const WARNING_LETTER_PENALTY_CAP = 50;
 
+// ndi_flags (migration 005) records our own judgment call on whether an NDI
+// notification was *expected* for an ingredient, not an FDA finding -- so
+// this penalty sits below warning_letters' despite both pointing at a real
+// DSHEA compliance gap. Per schema comment §12.4 and the worksheet's own
+// rule, absence of a notification is not itself a violation: only penalize
+// the expected-but-not-found case. expected && found is a clean, verified
+// record (no penalty); !expected is not applicable (no penalty). No
+// active/closed concept here -- it's a point-in-time determination, not an
+// ongoing case, so no doubling.
+const NDI_FLAG_PENALTY = 15;
+const NDI_FLAG_PENALTY_CAP = 30;
+
 export function scoreRegulatoryCompliance(input: RegulatoryComplianceInput): number {
   const penaltyBySeverity: Record<string, number> = {};
   for (const recall of input.recalls) {
@@ -116,8 +128,19 @@ export function scoreRegulatoryCompliance(input: RegulatoryComplianceInput): num
   );
   const warningLetterPenalty = Math.min(warningLetterPenaltyRaw, WARNING_LETTER_PENALTY_CAP);
 
+  const ndiFlagPenaltyRaw = input.ndiFlags.reduce(
+    (sum, flag) =>
+      sum + (flag.expectedNotification && !flag.notificationFound ? NDI_FLAG_PENALTY : 0),
+    0,
+  );
+  const ndiFlagPenalty = Math.min(ndiFlagPenaltyRaw, NDI_FLAG_PENALTY_CAP);
+
   const totalPenalty =
-    recallPenalty + inspectionPenalty + regulatoryActionPenalty + warningLetterPenalty;
+    recallPenalty +
+    inspectionPenalty +
+    regulatoryActionPenalty +
+    warningLetterPenalty +
+    ndiFlagPenalty;
   return Math.max(0, 100 - totalPenalty);
 }
 

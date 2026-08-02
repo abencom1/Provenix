@@ -22,11 +22,17 @@ export type WarningLetterRecord = {
   status: "active" | "closed";
 };
 
+export type NdiFlagRecord = {
+  expectedNotification: boolean;
+  notificationFound: boolean;
+};
+
 export type RegulatoryComplianceInput = {
   recalls: RecallRecord[];
   inspectionClassifications: InspectionClassificationRecord[];
   regulatoryActions: RegulatoryActionRecord[];
   warningLetters: WarningLetterRecord[];
+  ndiFlags: NdiFlagRecord[];
 };
 
 export type AdverseEventsInput = {
