@@ -185,21 +185,23 @@ from brands b where b.name = 'New Chapter';
 -- ----------------------------------------------------------------------------
 -- Lab testing (newchapter.com quality pages, retrieved 2026-08-02)
 -- ----------------------------------------------------------------------------
+with p as (select id from products where name = 'New Chapter One Daily Prenatal Multivitamin, 90 Vegetarian Tablets')
 insert into lab_testing (product_id, tier, evidence, source, last_verified)
 select p.id, 'claimed_no_public_coa'::lab_testing_tier,
        'newchapter.com quality pages describe third-party lab testing (incl. Alkemist Labs) and '
        || 'HPTLC/HPLC botanical identity testing; $2M+/year testing spend claimed. No public per-lot '
        || 'CoA lookup tool found.',
        'web_research', now()
-from product_new_chapter p;
+from p;
 
 -- ----------------------------------------------------------------------------
 -- Certifications (label claims, retrieved 2026-08-02) — claimed_unverified
 -- pending manual lookup at each certifier's own site, per the worksheet's rule
 -- ----------------------------------------------------------------------------
+with p as (select id from products where name = 'New Chapter One Daily Prenatal Multivitamin, 90 Vegetarian Tablets')
 insert into certifications (product_id, cert_type, status, source, last_verified)
 select p.id, 'other'::certification_type, 'claimed_unverified', 'label_claim_nsf_gluten_free', now()
-from product_new_chapter p
+from p
 union all
 select p.id, 'other'::certification_type, 'claimed_unverified', 'label_claim_non_gmo_project_verified', now()
-from product_new_chapter p;
+from p;

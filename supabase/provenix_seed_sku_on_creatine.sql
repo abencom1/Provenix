@@ -78,13 +78,15 @@ insert into manufacturer_attribution_facilities (attribution_id, facility_id, is
 select attribution_on_creatine.id, existing_on_facility.id, true
 from attribution_on_creatine, existing_on_facility;
 
+with p as (select id from products where name = 'Optimum Nutrition Micronized Creatine Powder, Unflavored, 60 Servings (UPC 7 48927 02384 8)')
 insert into lab_testing (product_id, tier, evidence, source, last_verified)
 select p.id, 'claimed_no_public_coa'::lab_testing_tier,
        'Optimum Nutrition requires vendor CoAs for raw materials and claims in-house/independent lab '
        || 'verification; no public per-lot CoA lookup tool found for this product.',
        'web_research', now()
-from product_on_creatine p;
+from p;
 
+with p as (select id from products where name = 'Optimum Nutrition Micronized Creatine Powder, Unflavored, 60 Servings (UPC 7 48927 02384 8)')
 insert into certifications (product_id, cert_type, status, source, last_verified)
 select p.id, 'informed_choice'::certification_type, 'claimed_unverified', 'label_claim_informed_choice', now()
-from product_on_creatine p;
+from p;

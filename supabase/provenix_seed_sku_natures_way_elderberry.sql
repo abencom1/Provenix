@@ -159,6 +159,7 @@ from brands b where b.name = 'Nature''s Way';
 -- Lab testing (naturesway.com "Know What's In Your Bottle" tool, retrieved
 -- 2026-08-02)
 -- ----------------------------------------------------------------------------
+with p as (select id from products where name = 'Nature''s Way Sambucus Elderberry Immune Gummy, Zero Sugar, 70 Gummies')
 insert into lab_testing (product_id, tier, evidence, source, last_verified)
 select p.id, 'coa_not_per_lot'::lab_testing_tier,
        'naturesway.com "Know What''s In Your Bottle" tool: searchable by product name/SKU/ingredient, '
@@ -166,4 +167,4 @@ select p.id, 'coa_not_per_lot'::lab_testing_tier,
        || 'ISO 17025-accredited lab. Not searchable by the lot number printed on a specific bottle, '
        || 'so not a Tier 4 per-lot lookup.',
        'web_research', now()
-from product_elderberry p;
+from p;
