@@ -29,6 +29,14 @@
 -- have zero facility rows, not a null-FEI one.
 -- ============================================================================
 
-alter table brands add constraint brands_name_key unique (name);
-alter table products add constraint products_name_key unique (name);
-create unique index facilities_fei_number_key on facilities (fei_number) where fei_number is not null;
+do $$
+begin
+    if not exists (select 1 from pg_constraint where conname = 'brands_name_key') then
+        alter table brands add constraint brands_name_key unique (name);
+    end if;
+    if not exists (select 1 from pg_constraint where conname = 'products_name_key') then
+        alter table products add constraint products_name_key unique (name);
+    end if;
+end $$;
+
+create unique index if not exists facilities_fei_number_key on facilities (fei_number) where fei_number is not null;
