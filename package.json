@@ -43,7 +43,8 @@
     "lint": "expo lint",
     "score": "tsx scripts/runScoring.ts",
     "test:excipient-boundaries": "tsx scripts/testExcipientLayerBoundaries.ts",
-    "test:dose-reality-gate": "tsx scripts/testDoseRealityGate.ts"
+    "test:dose-reality-gate": "tsx scripts/testDoseRealityGate.ts",
+    "changelog:record": "tsx scripts/recordMethodologyChangelogEntry.ts"
   },
   "private": true
 }
