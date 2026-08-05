@@ -7,6 +7,19 @@ import type {
   TestingQualityInput,
 } from "./types";
 
+// Excipient regulatory flags (provenix_excipient_personalization_spec_v0.5.md
+// §10.6, decisions log #1/#3) score inside regulatory_compliance as one more
+// penalty type, deliberately NOT a new top-level subscore -- no reweighting
+// of the other five weights, no model-v2 event. Values below are provisional
+// starting defaults, not calibrated against real excipient data yet --
+// revisit once Build Prompt 3.1's tables actually have rows in them.
+// Pitched at the same order of magnitude as WARNING_LETTER_PENALTY: a
+// Tier-I regulator acting against a specific ingredient is a comparably
+// serious, citable finding, same "real regulator, real action" bar as a
+// warning letter.
+const EXCIPIENT_REGULATORY_ACTION_PENALTY = 20;
+const EXCIPIENT_REGULATORY_ACTION_PENALTY_CAP = 40;
+
 export function scoreManufacturerTransparency(
   input: ManufacturerTransparencyInput,
 ): number | null {
@@ -135,12 +148,30 @@ export function scoreRegulatoryCompliance(input: RegulatoryComplianceInput): num
   );
   const ndiFlagPenalty = Math.min(ndiFlagPenaltyRaw, NDI_FLAG_PENALTY_CAP);
 
+  // Same active/closed doubling as recalls/warning letters: a still-active
+  // Tier-I restriction is a live, ongoing signal, not a resolved historical
+  // one. No regulator-identity weighting -- any of the four scores equally,
+  // per §9.1/decisions log #1.
+  const excipientRegulatoryActionPenaltyRaw = input.excipientRegulatoryActions.reduce(
+    (sum, action) =>
+      sum +
+      (action.status === "active"
+        ? EXCIPIENT_REGULATORY_ACTION_PENALTY * 2
+        : EXCIPIENT_REGULATORY_ACTION_PENALTY),
+    0,
+  );
+  const excipientRegulatoryActionPenalty = Math.min(
+    excipientRegulatoryActionPenaltyRaw,
+    EXCIPIENT_REGULATORY_ACTION_PENALTY_CAP,
+  );
+
   const totalPenalty =
     recallPenalty +
     inspectionPenalty +
     regulatoryActionPenalty +
     warningLetterPenalty +
-    ndiFlagPenalty;
+    ndiFlagPenalty +
+    excipientRegulatoryActionPenalty;
   return Math.max(0, 100 - totalPenalty);
 }
 

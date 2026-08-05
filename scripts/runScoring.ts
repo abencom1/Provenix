@@ -88,6 +88,16 @@ async function buildScoringInput(product: SeedProduct): Promise<ProductScoringIn
     .select("expected_notification, notification_found")
     .eq("product_id", product.id);
 
+  // Reads product_excipient_regulatory_flags (migration 007), not the raw
+  // excipient_regulatory_actions table directly -- the view is the one
+  // sanctioned path from the excipient layer into scoring (see the v0.5
+  // spec's §10.5). No regulator filter here or in the view itself: every
+  // row returned is already scoreable by construction.
+  const { data: excipientRegulatoryActions } = await supabase
+    .from("product_excipient_regulatory_flags")
+    .select("status")
+    .eq("product_id", product.id);
+
   const { data: adverseEvents } = await supabase
     .from("adverse_event_counts")
     .select("report_count")
@@ -132,6 +142,9 @@ async function buildScoringInput(product: SeedProduct): Promise<ProductScoringIn
       ndiFlags: (ndiFlags ?? []).map((f) => ({
         expectedNotification: f.expected_notification,
         notificationFound: f.notification_found,
+      })),
+      excipientRegulatoryActions: (excipientRegulatoryActions ?? []).map((a) => ({
+        status: a.status as "active" | "closed",
       })),
     },
     adverseEvents: { reportCount: adverseEvents?.report_count ?? null },

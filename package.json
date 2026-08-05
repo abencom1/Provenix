@@ -41,7 +41,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "score": "tsx scripts/runScoring.ts"
+    "score": "tsx scripts/runScoring.ts",
+    "test:excipient-boundaries": "tsx scripts/testExcipientLayerBoundaries.ts"
   },
   "private": true
 }

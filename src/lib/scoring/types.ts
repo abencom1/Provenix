@@ -22,6 +22,16 @@ export type WarningLetterRecord = {
   status: "active" | "closed";
 };
 
+// A Tier-I regulator's action against an INGREDIENT (excipient_regulatory_actions,
+// via the product_excipient_regulatory_flags view) — distinct from
+// RegulatoryActionRecord above, which is a brand/facility-level action (FTC,
+// state AGs, etc.). Every row reaching this type is already scoreable by
+// construction (the view has no regulator filter) — see
+// provenix_excipient_personalization_spec_v0.5.md §10.5/§10.6.
+export type ExcipientRegulatoryActionRecord = {
+  status: "active" | "closed";
+};
+
 export type NdiFlagRecord = {
   expectedNotification: boolean;
   notificationFound: boolean;
@@ -33,6 +43,7 @@ export type RegulatoryComplianceInput = {
   regulatoryActions: RegulatoryActionRecord[];
   warningLetters: WarningLetterRecord[];
   ndiFlags: NdiFlagRecord[];
+  excipientRegulatoryActions: ExcipientRegulatoryActionRecord[];
 };
 
 export type AdverseEventsInput = {
