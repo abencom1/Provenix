@@ -42,7 +42,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "score": "tsx scripts/runScoring.ts",
-    "test:excipient-boundaries": "tsx scripts/testExcipientLayerBoundaries.ts"
+    "test:excipient-boundaries": "tsx scripts/testExcipientLayerBoundaries.ts",
+    "test:dose-reality-gate": "tsx scripts/testDoseRealityGate.ts"
   },
   "private": true
 }
