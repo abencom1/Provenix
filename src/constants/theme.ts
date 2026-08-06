@@ -7,20 +7,43 @@ import '@/global.css';
 
 import { Platform } from 'react-native';
 
+// App UI brand direction: "D2 Clarity" (light spa-green) — app-wide as of
+// 2026-08-06, matching the web landing page. See
+// project_provenix_brand_direction memory. Tokens below are taken directly
+// from provenix_landing.html's --canvas/--mist/--sage/--grove/--deep/--ink/
+// --muted/--faint/--amber custom properties, not reinvented.
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+    text: '#1A2E28',
+    textSecondary: '#4A6B61',
+    textMuted: '#8AADA6',
+    background: '#F6FBF9',
+    backgroundElement: '#EAF5F0',
+    backgroundSelected: '#DCEEE6',
+    border: '#C8DDD8',
+    primary: '#1C7A5E',
+    primaryText: '#FFFFFF',
+    primarySubtle: '#EAF5F0',
+    primarySubtleBorder: '#C8DDD8',
+    success: '#1C7A5E',
+    warning: '#D97706',
+    danger: '#B54834',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    text: '#EAF3EF',
+    textSecondary: '#9DB8AE',
+    textMuted: '#638075',
+    background: '#0E1613',
+    backgroundElement: '#16211D',
+    backgroundSelected: '#1E2C26',
+    border: '#2A3D35',
+    primary: '#3FAE87',
+    primaryText: '#06231A',
+    primarySubtle: '#16211D',
+    primarySubtleBorder: '#2A3D35',
+    success: '#3FAE87',
+    warning: '#E3A455',
+    danger: '#D97A63',
   },
 } as const;
 
