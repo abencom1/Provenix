@@ -44,7 +44,8 @@
     "score": "tsx scripts/runScoring.ts",
     "test:excipient-boundaries": "tsx scripts/testExcipientLayerBoundaries.ts",
     "test:dose-reality-gate": "tsx scripts/testDoseRealityGate.ts",
-    "changelog:record": "tsx scripts/recordMethodologyChangelogEntry.ts"
+    "changelog:record": "tsx scripts/recordMethodologyChangelogEntry.ts",
+    "test:compatibility-resolution": "tsx scripts/testCompatibilityResolution.ts"
   },
   "private": true
 }
